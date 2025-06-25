@@ -289,9 +289,16 @@ async function loadContractFunctions(contractAddr, contractABI) {
 
       button.addEventListener('click', async () => {
         const args = func.inputs.map(input => {
-          return document.getElementById(func.name + '_' + input.name).value;
+                const rawValue = document.getElementById(func.name + '_' + input.name).value;
+                if (input.type === "bytes32") {
+                  return ethers.encodeBytes32String(rawValue);
+                }
+                return rawValue;
         });
 /* 
+
+        const args = func.inputs.map(input => {
+          return document.getElementById(func.name + '_' + input.name).value;
 const args = func.inputs.map(input => {
   const rawValue = document.getElementById(func.name + '_' + input.name).value;
   if (input.type === "bytes32") {
