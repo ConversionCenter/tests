@@ -325,11 +325,29 @@ async function loadContractFunctions(contractAddr, contractABI) {
     }
   });
 }
-
 window.addEventListener('DOMContentLoaded', async () => {
   listABIs();
   setTxLevel('spuffMinimal');
+  try {
+    if (!window.ethereum) return;
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    const balance = await provider.getBalance(address);
+    const ethBalance = parseFloat(ethers.formatEther(balance));
+
+    if (ethBalance < 0.002) {
+      setTxLevel('spuffMinimal');
+    } else if (ethBalance >= 0.002 && ethBalance < 0.2) {
+      setTxLevel('spuffProtect');
+    } else {
+      setTxLevel('definietly Not a spuff');
+    }
+  } catch (err) {
+    console.warn("Error with wallet:", err.message);
+  }
 });
+
 </script>
 
 </body>
