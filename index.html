@@ -290,9 +290,12 @@ async function loadContractFunctions(contractAddr, contractABI) {
       button.addEventListener('click', async () => {
         const args = func.inputs.map(input => {
                 const rawValue = document.getElementById(func.name + '_' + input.name).value;
-                if (input.type === "bytes32") {
-                  return ethers.encodeBytes32String(rawValue);
-                }
+                    if (input.type === "bytes32") {
+                      if (!/^0x[0-9a-fA-F]{64}$/.test(rawValue)) {
+                         return ethers.encodeBytes32String(rawValue);
+                      }
+                      return rawValue;
+                    }
                 return rawValue;
         });
 /* 
