@@ -98,6 +98,23 @@
 
 <h1>Conversion Center Interface</h1>
 
+<p>
+  Here you enter some document number or date of Birth and Your Persian or Christian name to hash it,
+  encrypt it so that only you know what that number in DecetralizedID field means.
+</p>
+
+<p>
+  Please enter full or Initials for Christian name in Field <strong>nameC</strong> and Initial or full name
+  in field <strong>nameP</strong> and your initial or full sirname in field <strong>nameS</strong>
+</p>
+
+<div style="margin-bottom: 20px;">
+  <label>Document Number / Birth Date:</label>
+  <input type="text" id="hashInput" placeholder="e.g. 1990-01-01 or ABC123" style="width: 300px;" />
+  <button onclick="hashData()">Hash (keccak256)</button>
+  <p><strong>Resulting bytes32 hash:</strong> <span id="hashResult" style="color: navy;"></span></p>
+</div>
+
 <div style="text-align: center;">
   <button onclick="connectMetamask()">Connect Metamask with Arbitrum One network</button>
 </div>
@@ -203,7 +220,18 @@ function listABIs() {
     selector.appendChild(option);
   });
 }
-
+  
+async function hashData() {
+  const input = document.getElementById("hashInput").value;
+  if (!input) {
+    document.getElementById("hashResult").innerText = "Please enter data to hash.";
+    return;
+  }
+  const bytes = ethers.encodeBytes32String(input);
+  const hash = ethers.keccak256(bytes);
+  document.getElementById("hashResult").innerText = hash;
+}
+  
 async function loadSelectedContract() {
   const selector = document.getElementById('abiSelector');
   const abiFile = selector.value;
