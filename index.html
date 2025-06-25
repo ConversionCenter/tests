@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Conversion Center Interface</title>
+  <script src="./ethers.umd.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      color: #000033;
+      padding: 20px;
+    }
+
+    h1 {
+      color: goldenrod;
+      text-align: center;
+    }
+
+    select, input, button {
+      font-size: 1rem;
+      padding: 8px;
+      margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: goldenrod;
+      color: white;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #d4af37;
+    }
+
+    .tx-button.selected {
+      background-color: navy !important;
+      color: white !important;
+    }
+
+    #rulesDisplay, #declarationsTable {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #4169e1;
+      color: white;
+    }
+
+    hr {
+      border: none;
+      height: 3px;
+      background: goldenrod;
+      margin: 30px 0;
+    }
+
+    #contractFunctions > div {
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #ffffff;
+      border-left: 5px solid #4169e1;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .view, .pure {
+      background-color: #e6f0ff;
+    }
+
+    #messageBox {
+      white-space: pre-wrap;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 20px;
+      color: navy;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Conversion Center Interface</h1>
+
+<div style="text-align: center;">
+  <button onclick="connectMetamask()">Connect Metamask with Arbitrum One network</button>
+</div>
+
+<div id="rulesDisplay"></div>
+
+<hr>
+
+<div id="declarationsTable"></div>
+
+<br>
+
+<div style="text-align: center;">
+  <select id="abiSelector"></select>
+  <button onclick="loadSelectedContract()">Show Options</button>
+</div>
+
+<div id="contractFunctions"></div>
+<div id="messageBox"></div>
+
+<script>
+const abiFolderPath = './ABIfiles/';
+const files = ['0x1d7cc83AB52fAad168A9FC400b26062e850a0C30.ConversionCenter.abi'];
+let txLevel = 'spuffMinimal';
+
+const contractAddress = "0x1d7cc83AB52fAad168A9FC400b26062e850a0C30"; // Placeholder
+
+async function connectMetamask() {
+  if (!window.ethereum) return alert("Metamask not available");
+  try {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: '0xa4b1',
+        chainName: 'Arbitrum One',
+        rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+        nativeCurrency: {
+          name: 'Ether',
+          symbol: 'ETH',
+          decimals: 18
+        },
+        blockExplorerUrls: ['https://arbiscan.io']
+      }]
+    });
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    loadRulesAndStatements();
+  } catch (error) {
+    alert("Connection failed: " + error.message);
+  }
+}
+
+async function loadRulesAndStatements() {
+  const contractABI = await fetch(abiFolderPath + files[0]).then(res => res.json());
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+  try {
+    const rules = await contract.view11Rules();
+    document.getElementById('rulesDisplay').innerHTML = `<h3>view11Rules:</h3><p>${rules}</p>`;
+  } catch (err) {
+    document.getElementById('rulesDisplay').innerText = 'Error fetching view11Rules: ' + err.message;
+  }
+
+  try {
+    const index = await contract.indexStatement();
+    const table = document.createElement('table');
+    const header = document.createElement('tr');
+    header.innerHTML = `<th>Index of Declaration</th><th>Declaration Text</th>`;
+    table.appendChild(header);
+
+    for (let i = 1; i <= index; i++) {
+      try {
+        const text = await contract.statements(i);
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${i}</td><td>${text}</td>`;
+        table.appendChild(row);
+      } catch (e) {
+        console.warn("Error loading statement at index", i, e);
+      }
+    }
+
+    const container = document.getElementById('declarationsTable');
+    container.innerHTML = "<h3>Declarations:</h3>";
+    container.appendChild(table);
+  } catch (err) {
+    document.getElementById('declarationsTable').innerText = 'Error loading declarations: ' + err.message;
+  }
+}
+
+function setTxLevel(level) {
+  txLevel = level;
+  document.querySelectorAll('.tx-button').forEach(btn => btn.classList.remove('selected'));
+  const btn = document.getElementById('btn-' + level);
+  if (btn) btn.classList.add('selected');
+}
+
+function listABIs() {
+  const selector = document.getElementById('abiSelector');
+  files.forEach(file => {
+    const option = document.createElement('option');
+    option.value = file;
+    option.innerText = file.split('.abi')[0];
+    selector.appendChild(option);
+  });
+}
+
+async function loadSelectedContract() {
+  const selector = document.getElementById('abiSelector');
+  const abiFile = selector.value;
+  const contractAddr = abiFile.split('.')[0];
+  const contractABI = await fetch(abiFolderPath + abiFile).then(response => response.json());
+  loadContractFunctions(contractAddr, contractABI);
+}
+
+async function loadContractFunctions(contractAddr, contractABI) {
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+  const contract = new ethers.Contract(contractAddr, contractABI, signer);
+  const container = document.getElementById('contractFunctions');
+  container.innerHTML = '';
+
+  contractABI.forEach(func => {
+    if (func.type === "function") {
+      const funcDiv = document.createElement('div');
+      funcDiv.className = func.stateMutability;
+
+      const button = document.createElement('button');
+      button.textContent = func.name;
+      button.className = func.stateMutability;
+
+      const inputsDiv = document.createElement('div');
+      func.inputs.forEach(input => {
+        const inputLabel = document.createElement('label');
+        inputLabel.textContent = input.name + ' (' + input.type + '): ';
+        const inputElement = document.createElement('input');
+        inputElement.setAttribute('id', func.name + '_' + input.name);
+        inputElement.setAttribute('type', 'text');
+        inputsDiv.appendChild(document.createElement('br'));
+        inputsDiv.appendChild(inputLabel);
+        inputsDiv.appendChild(inputElement);
+      });
+
+      button.addEventListener('click', async () => {
+        const args = func.inputs.map(input => {
+          return document.getElementById(func.name + '_' + input.name).value;
+        });
+
+        try {
+          let result;
+          if (func.stateMutability !== 'view' && func.stateMutability !== 'pure') {
+            let value;
+            if (txLevel === 'spuffProtect') value = ethers.parseEther("0.006");
+            else if (txLevel === 'definietly Not a spuff') value = ethers.parseEther("0.021");
+            else value = ethers.parseEther("0.00012");
+            result = await contract[func.name](...args, { value });
+          } else {
+            result = await contract[func.name](...args);
+          }
+
+          let formatted = typeof result === 'object'
+            ? JSON.stringify(result, null, 2)
+            : String(result);
+          formatted = formatted
+            .replace(/{/g, '\n{\n')
+            .replace(/}/g, '\n}\n')
+            .replace(/,/g, '\n')
+            .replace(/\[/g, '\n[\n')
+            .replace(/\]/g, '\n]\n');
+          document.getElementById('messageBox').innerText = formatted;
+        } catch (error) {
+          document.getElementById('messageBox').innerText = 'Error: ' + error.message;
+        }
+      });
+
+      funcDiv.appendChild(button);
+      funcDiv.appendChild(inputsDiv);
+      container.appendChild(funcDiv);
+    }
+  });
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  listABIs();
+  setTxLevel('spuffMinimal');
+});
+</script>
+
+</body>
+</html>
