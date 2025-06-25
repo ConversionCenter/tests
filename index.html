@@ -291,7 +291,15 @@ async function loadContractFunctions(contractAddr, contractABI) {
         const args = func.inputs.map(input => {
           return document.getElementById(func.name + '_' + input.name).value;
         });
-
+/* 
+const args = func.inputs.map(input => {
+  const rawValue = document.getElementById(func.name + '_' + input.name).value;
+  if (input.type === "bytes32") {
+    return ethers.encodeBytes32String(rawValue);
+  }
+  return rawValue;
+});
+*/
         try {
           let result;
           if (func.stateMutability !== 'view' && func.stateMutability !== 'pure') {
