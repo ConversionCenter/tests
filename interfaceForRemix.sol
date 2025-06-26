@@ -14,10 +14,10 @@ interface IConversionCenterEndUser {
         string memory nameP,
         string memory nameC,
         string memory Sirname,
+        bytes32 decentralizedID,
         bool ifIRAN,
-        bytes32 inputCountry,
-        uint256 indexOfAnswer,
-        bytes32 decentralizedID) external payable;
+        string inputCountry,
+        uint256 indexOfAnswer) external payable;
     function viewCitizen(uint256 index) external view returns (DecentralizedPassport memory);
 
     function spuff() external view returns (uint256);
