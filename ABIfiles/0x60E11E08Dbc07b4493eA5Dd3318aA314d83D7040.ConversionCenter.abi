@@ -2,6 +2,49 @@
 	{
 		"inputs": [
 			{
+				"internalType": "string",
+				"name": "nameP",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "nameC",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "Sirname",
+				"type": "string"
+			},
+			{
+				"internalType": "bool",
+				"name": "ifIRAN",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "inputCountry",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "indexOfAnswer",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "decentralizedID",
+				"type": "bytes32"
+			}
+		],
+		"name": "createProfileConvertAndVoteForDemocracy",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "bytes32",
 				"name": "",
 				"type": "bytes32"
@@ -98,49 +141,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "nameP",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "nameC",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "Sirname",
-				"type": "string"
-			},
-			{
-				"internalType": "bool",
-				"name": "ifIRAN",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "inputCountry",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "indexOfAnswer",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "decentralizedID",
-				"type": "bytes32"
-			}
-		],
-		"name": "createProfileConvertAndVoteForDemocracy",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
@@ -160,13 +160,13 @@
 	{
 		"inputs": [
 			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
+				"internalType": "string",
+				"name": "country",
+				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "WhatDeclared",
 				"type": "uint256"
 			}
 		],
