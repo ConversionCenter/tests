@@ -18,13 +18,14 @@ interface IConversionCenterEndUser {
         bool ifIRAN,
         string inputCountry,
         uint256 indexOfAnswer) external payable;
+    function declarations(string, uint256) external view returns (uint256);
     function viewCitizen(uint256 index) external view returns (DecentralizedPassport memory);
 
     function spuff() external view returns (uint256);
     function indexStatement() external view returns (uint256);
     function statements(uint256) external view returns (string memory);
-    function declarations(bytes32, uint256) external view returns (uint256);
-    function howManyVoted(bytes32) external view returns (uint256);
+
+    function howManyVoted(string) external view returns (uint256);
     function citizens(uint256) external view returns (
         string memory nameP,
         string memory nameC,
