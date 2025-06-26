@@ -27,14 +27,14 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
-				"name": "indexOfAnswer",
-				"type": "uint256"
-			},
-			{
 				"internalType": "bytes32",
 				"name": "decentralizedID",
 				"type": "bytes32"
+			},
+			{
+				"internalType": "uint256",
+				"name": "indexOfAnswer",
+				"type": "uint256"
 			}
 		],
 		"name": "createProfileConvertAndVoteForDemocracy",
